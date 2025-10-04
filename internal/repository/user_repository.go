@@ -11,6 +11,9 @@ type UserRepository interface {
 	FindByEmail(email string) (model.User, error)
 	CreateUser(user *model.User) error
 	UpdateUser(user model.User) error
+	GetAllUsers() ([]model.User, error)
+	GetUsersCount() (int, error)
+	DeleteUserByID(userID uint) error
 }
 
 type userRepository struct {
@@ -40,5 +43,20 @@ func (r *userRepository) CreateUser(user *model.User) error {
 
 func (r *userRepository) UpdateUser(user model.User) error {
 	result := r.db.Save(&user)
+	return result.Error
+}
+func (r *userRepository) GetAllUsers() ([]model.User, error) {
+	var users []model.User
+	result := r.db.Find(&users)
+	return users, result.Error
+}
+
+func (r *userRepository) GetUsersCount() (int, error) {
+	var count int64
+	result := r.db.Model(&model.User{}).Count(&count)
+	return int(count), result.Error
+}
+func (r *userRepository) DeleteUserByID(userID uint) error {
+	result := r.db.Delete(&model.User{}, userID)
 	return result.Error
 }

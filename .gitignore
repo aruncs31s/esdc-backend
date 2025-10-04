@@ -1,1 +1,11 @@
 .env
+
+# Uploaded files
+uploads/images/*
+uploads/files/*
+!uploads/images/.gitkeep
+!uploads/files/.gitkeep
+!uploads/README.md
+
+# Build artifacts
+tmp/

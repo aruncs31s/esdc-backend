@@ -14,7 +14,7 @@ import (
 func RegisterRoutes(r *gin.Engine) *gin.Engine {
 	r.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
-			return origin == "http://localhost:4200" ||
+			return origin == "http://localhost:4000" ||
 				origin == "http://192.168.29.49:3000" || origin == "http://localhost:5173"
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -31,6 +31,22 @@ func RegisterRoutes(r *gin.Engine) *gin.Engine {
 
 	registerUserRoutes(r, userHandler)
 
+	// Projects Routes
+
+	projectRepository := repository.NewProjectRepository(db)
+	projectService := service.NewProjectService(projectRepository)
+	projectHandler := handler.NewProjectHandler(projectService)
+
+	registerProjectsRoutes(r, projectHandler)
+
+	// File Upload Routes (can be protected with middleware if needed)
+	fileService := service.NewFileService("./uploads")
+	fileHandler := handler.NewFileHandler(fileService)
+	registerFileRoutes(r, fileHandler)
+
+	// Serve static files (uploaded files)
+	r.Static("/uploads", "./uploads")
+
 	// Now use middleware to protect the routes
 	r.Use(middleware.JwtMiddleware())
 	postsRepository := repository.NewPostsRepository(db)
@@ -39,6 +55,10 @@ func RegisterRoutes(r *gin.Engine) *gin.Engine {
 
 	registerPostRoutes(r, postsHandler)
 
-	return r
+	// Admin Routes
+	adminService := service.NewAdminService(userRepository, projectRepository)
+	adminHandler := handler.NewAdminHandler(adminService)
+	registerAdminRoutes(r, adminHandler)
 
+	return r
 }

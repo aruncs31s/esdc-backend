@@ -30,9 +30,7 @@ func NewUserHandler(userService service.UserService) UserHandler {
 }
 
 func (h *userHandler) Login(c *gin.Context) {
-	// log.Fatal("Login Handler Called")
 	var loginData dto.LoginRequest
-	// Get the login Data
 	if err := c.ShouldBindJSON(&loginData); err != nil {
 		h.responseHelper.BadRequest(c, "Bad request", "Invalid request payload")
 		return
@@ -43,10 +41,6 @@ func (h *userHandler) Login(c *gin.Context) {
 		h.responseHelper.InternalError(c, "Could not create token", err)
 		return
 	}
-	
-	user := map[string]interface{}{
-		"email":    loginData.Email,
-		
 
 	h.responseHelper.Success(c, gin.H{"token": token})
 }
