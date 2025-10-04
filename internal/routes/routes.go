@@ -15,7 +15,7 @@ func RegisterRoutes(r *gin.Engine) *gin.Engine {
 	r.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
 			return origin == "http://localhost:4000" ||
-				origin == "http://192.168.29.49:3000" || origin == "http://localhost:5173"
+				origin == "http://192.168.29.49:3000" || origin == "http://localhost:5173" || origin == "https://esdc.vercel.app"
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "sentry-trace", "baggage"},
