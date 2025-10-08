@@ -15,5 +15,5 @@ func init() {
 func main() {
 	r := gin.Default()
 	r = routes.RegisterRoutes(r)
-	r.Run()
+	r.Run(":9090")
 }

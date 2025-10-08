@@ -67,7 +67,7 @@ func (s *adminService) CreateUser(user dto.RegisterRequest) error {
 		Username: user.Username,
 		Email:    user.Email,
 		Role:     user.Role,
-		Status:   user.Status,
+		// Status:   user.Status,
 		Password: user.Password, //
 		Github: &model.Github{
 			Username: user.GithubUsername,

@@ -1,9 +1,8 @@
 package model
 
-// TODO: Seperate the concerns
-
 type User struct {
 	ID          uint          `gorm:"primaryKey" json:"id"`
+	Name        string        `gorm:"not null" json:"name"`
 	Username    string        `gorm:"unique;not null" json:"username"`
 	Email       string        `gorm:"unique;not null" json:"email"`
 	Password    string        `gorm:"not null" json:"password"`
@@ -15,6 +14,7 @@ type User struct {
 	Github      *Github       `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 	Submissions *[]Submission `gorm:"foreignKey:UserID;"`
 	Details     *UserDetails  `gorm:"foreignKey:ID;references:ID;constraint:OnDelete:CASCADE"`
+	Link        string        `gorm:"column:link"`
 }
 
 type Github struct {

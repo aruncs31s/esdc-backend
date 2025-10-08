@@ -7,7 +7,7 @@ import (
 
 type UserService interface {
 	Login(email, password string) (string, error)
-	Register(username, email, password string) error
+	Register(name, username, email, password string) error
 	VerifyEmail(token string) error
 	ForgotPassword(email string) error
 	ResetPassword(token, newPassword string) error
@@ -42,9 +42,10 @@ func (s *userService) Login(email, password string) (string, error) {
 	return token, nil
 }
 
-func (s *userService) Register(username, email, password string) error {
+func (s *userService) Register(name, username, email, password string) error {
 
 	user := model.User{
+		Name:     name,
 		Username: username,
 		Email:    email,
 		Password: password,

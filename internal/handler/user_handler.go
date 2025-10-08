@@ -4,6 +4,7 @@ import (
 	"esdc-backend/internal/dto"
 	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,9 +59,12 @@ func (h *userHandler) Register(c *gin.Context) {
 	}
 
 	err := h.userService.Register(
+		registerData.Name,
 		registerData.Username,
 		registerData.Email,
 		registerData.Password)
+	log.Fatal("Username: ", registerData.Username)
+
 	if err != nil {
 		h.responseHelper.InternalError(c, "Could not register user", err)
 		return
