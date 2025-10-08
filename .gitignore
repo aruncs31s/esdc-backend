@@ -9,3 +9,5 @@ uploads/files/*
 
 # Build artifacts
 tmp/
+
+database/db.db
