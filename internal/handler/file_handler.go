@@ -27,7 +27,18 @@ func NewFileHandler(fileService service.FileService) FileHandler {
 	}
 }
 
-// UploadImage handles single image upload
+// UploadImage godoc
+// @Summary Upload an image
+// @Description Upload a single image file (jpg, jpeg, png, gif, webp) with max size 5MB
+// @Tags files
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param image formData file true "Image file to upload"
+// @Success 200 {object} map[string]interface{} "Image uploaded successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid file or no file uploaded"
+// @Failure 500 {object} map[string]interface{} "Failed to upload image"
+// @Router /upload/image [post]
 func (h *fileHandler) UploadImage(c *gin.Context) {
 	// Get file from form
 	file, err := c.FormFile("image")
@@ -58,7 +69,19 @@ func (h *fileHandler) UploadImage(c *gin.Context) {
 	})
 }
 
-// UploadFile handles single file upload (any type)
+// UploadFile godoc
+// @Summary Upload a file
+// @Description Upload a single file of any type with max size 10MB
+// @Tags files
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param file formData file true "File to upload"
+// @Param dir query string false "Upload directory" default(files)
+// @Success 200 {object} map[string]interface{} "File uploaded successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid file or no file uploaded"
+// @Failure 500 {object} map[string]interface{} "Failed to upload file"
+// @Router /upload/file [post]
 func (h *fileHandler) UploadFile(c *gin.Context) {
 	// Get file from form
 	file, err := c.FormFile("file")
@@ -93,7 +116,18 @@ func (h *fileHandler) UploadFile(c *gin.Context) {
 	})
 }
 
-// UploadMultipleFiles handles multiple file uploads
+// UploadMultipleFiles godoc
+// @Summary Upload multiple files
+// @Description Upload multiple files of any type with max size 10MB each
+// @Tags files
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param files formData file true "Files to upload" multiple
+// @Param dir query string false "Upload directory" default(files)
+// @Success 200 {object} map[string]interface{} "Files upload completed"
+// @Failure 400 {object} map[string]interface{} "No files uploaded or failed to parse form"
+// @Router /upload/files [post]
 func (h *fileHandler) UploadMultipleFiles(c *gin.Context) {
 	// Get form
 	form, err := c.MultipartForm()

@@ -21,6 +21,17 @@ func NewPostsHandler(postsService service.PostsService) PostHandler {
 	return &postsHandler{postsService: postsService, responseHelper: responseHelper}
 }
 
+// GetAllPosts godoc
+// @Summary Get all posts (Admin only)
+// @Description Retrieve all posts - requires admin role
+// @Tags posts
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Posts retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized - admin role required"
+// @Failure 500 {object} map[string]interface{} "Failed to retrieve posts"
+// @Router /posts [get]
 func (h *postsHandler) GetAllPosts(c *gin.Context) {
 	// Check if the user is an admin
 	role := c.GetString("role")

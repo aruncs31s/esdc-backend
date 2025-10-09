@@ -1,26 +1,25 @@
 package model
 
 type User struct {
-	ID          uint          `gorm:"primaryKey" json:"id"`
-	Name        string        `gorm:"not null" json:"name"`
-	Username    string        `gorm:"unique;not null" json:"username"`
-	Email       string        `gorm:"unique;not null" json:"email"`
-	Password    string        `gorm:"not null" json:"password"`
-	Role        string        `gorm:"not null;default:'user'" json:"role"`
-	Verified    *bool         `gorm:"not null;default:false" json:"verified"`
-	Status      string        `gorm:"not null;default:'active'" json:"status"`
-	CreatedAt   int64         `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt   int64         `gorm:"autoUpdateTime" json:"updated_at"`
+	ID          uint          `gorm:"column:id;primaryKey" json:"id"`
+	Name        string        `gorm:"column:name;not null" json:"name"`
+	Username    string        `gorm:"column:username;unique;not null" json:"username"`
+	Email       string        `gorm:"column:email;unique;not null" json:"email"`
+	Password    string        `gorm:"column:password;not null" json:"password"`
+	Role        string        `gorm:"column:role;not null;default:'user'" json:"role"`
+	Verified    *bool         `gorm:"column:verified;not null;default:false" json:"verified"`
+	Status      string        `gorm:"column:status;not null;default:'active'" json:"status"`
+	CreatedAt   int64         `gorm:"column:created_at;autoCreateTime" json:"created_at"`
+	UpdatedAt   int64         `gorm:"column:updated_at;autoUpdateTime" json:"updated_at"`
 	Github      *Github       `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 	Submissions *[]Submission `gorm:"foreignKey:UserID;"`
 	Details     *UserDetails  `gorm:"foreignKey:ID;references:ID;constraint:OnDelete:CASCADE"`
-	Link        string        `gorm:"column:link"`
 }
 
 type Github struct {
-	ID       uint   `gorm:"primaryKey"`
-	UserID   uint   `gorm:"not null"`
-	Username string `gorm:"not null"`
+	ID       uint   `gorm:"column:id;primaryKey"`
+	UserID   uint   `gorm:"column:user_id"`
+	Username string `gorm:"column:username;unique;not null"`
 }
 
 func (Github) TableName() string {

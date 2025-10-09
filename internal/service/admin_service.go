@@ -10,7 +10,7 @@ type AdminService interface {
 	GetAllUsers() ([]model.User, error)
 	GetUsersStats() (*dto.UsersStats, error)
 	DeleteUser(userID int) error
-	CreateUser(user dto.RegisterRequest) error
+	CreateUser(user dto.AdminRegisterRequest) error
 }
 
 type adminService struct {
@@ -42,7 +42,6 @@ func (s *adminService) GetUsersStats() (*dto.UsersStats, error) {
 	if err != nil {
 		return nil, err
 	}
-	// For testing
 	var activeUser = 2
 	var totalChallenges = 5
 
@@ -62,20 +61,17 @@ func (s *adminService) DeleteUser(userID int) error {
 	}
 	return nil
 }
-func (s *adminService) CreateUser(user dto.RegisterRequest) error {
+func (s *adminService) CreateUser(user dto.AdminRegisterRequest) error {
 	newUser := model.User{
 		Username: user.Username,
 		Email:    user.Email,
 		Role:     user.Role,
-		// Status:   user.Status,
-		Password: user.Password, //
+		Password: user.Password,
 		Github: &model.Github{
 			Username: user.GithubUsername,
 		},
-		Details: &model.UserDetails{
-			Email: user.Email,
-		},
 	}
+
 	err := s.userRepo.CreateUser(&newUser)
 	if err != nil {
 		return err

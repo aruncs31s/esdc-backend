@@ -1,9 +1,9 @@
 package model
 
 type UserDetails struct {
-	ID    uint   `gorm:"primaryKey"`
-	Email string `gorm:"unique;not null"`
-	Phone string `gorm:"not null"`
+	ID             uint    `gorm:"column:id;primaryKey"`
+	Phone          *string `gorm:"column:phone"`
+	ProfilePicLink string  `gorm:"column:profile_pic_link" json:"profile_pic_link"`
 }
 
 func (UserDetails) TableName() string {

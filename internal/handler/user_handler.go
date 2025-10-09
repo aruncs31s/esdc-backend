@@ -4,7 +4,6 @@ import (
 	"esdc-backend/internal/dto"
 	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
-	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,6 +29,17 @@ func NewUserHandler(userService service.UserService) UserHandler {
 	}
 }
 
+// Login godoc
+// @Summary User login
+// @Description Authenticate user with email and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param loginData body dto.LoginRequest true "Login credentials"
+// @Success 200 {object} map[string]interface{} "Login successful"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /login [post]
 func (h *userHandler) Login(c *gin.Context) {
 	var loginData dto.LoginRequest
 	if err := c.ShouldBindJSON(&loginData); err != nil {
@@ -50,6 +60,17 @@ func (h *userHandler) LogOut(c *gin.Context) {
 	// Implementation of logout logic
 }
 
+// Register godoc
+// @Summary User registration
+// @Description Register a new user account
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param registerData body dto.RegisterRequest true "Registration data"
+// @Success 200 {object} map[string]interface{} "Registration successful"
+// @Failure 400 {object} map[string]interface{} "Bad request"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /register [post]
 func (h *userHandler) Register(c *gin.Context) {
 	var registerData dto.RegisterRequest
 	// Get the register Data
@@ -58,18 +79,13 @@ func (h *userHandler) Register(c *gin.Context) {
 		return
 	}
 
-	err := h.userService.Register(
-		registerData.Name,
-		registerData.Username,
-		registerData.Email,
-		registerData.Password)
-	log.Fatal("Username: ", registerData.Username)
+	err := h.userService.Register(registerData)
 
 	if err != nil {
 		h.responseHelper.InternalError(c, "Could not register user", err)
 		return
 	}
-	h.responseHelper.Success(c, nil)
+	h.responseHelper.Success(c, registerData)
 }
 
 func (h *userHandler) VerifyEmail(c *gin.Context) {

@@ -1,13 +1,14 @@
 package service
 
 import (
+	"esdc-backend/internal/dto"
 	"esdc-backend/internal/model"
 	"esdc-backend/internal/repository"
 )
 
 type UserService interface {
 	Login(email, password string) (string, error)
-	Register(name, username, email, password string) error
+	Register(data dto.RegisterRequest) error
 	VerifyEmail(token string) error
 	ForgotPassword(email string) error
 	ResetPassword(token, newPassword string) error
@@ -42,15 +43,20 @@ func (s *userService) Login(email, password string) (string, error) {
 	return token, nil
 }
 
-func (s *userService) Register(name, username, email, password string) error {
+func (s *userService) Register(data dto.RegisterRequest) error {
 
 	user := model.User{
-		Name:     name,
-		Username: username,
-		Email:    email,
-		Password: password,
-		Role:     getRole(username),
+		Name:     data.Name,
+		Username: data.Username,
+		Email:    data.Email,
+		Password: data.Password,
+		Role:     getRole(data.Username),
 	}
+	github := model.Github{
+		Username: data.GithubUsername,
+	}
+	user.Github = &github
+
 	err := s.userRepo.CreateUser(&user)
 	if err != nil {
 		return err
