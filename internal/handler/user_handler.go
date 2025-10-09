@@ -4,6 +4,7 @@ import (
 	"esdc-backend/internal/dto"
 	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,10 +50,13 @@ func (h *userHandler) Login(c *gin.Context) {
 
 	token, err := h.userService.Login(loginData.Email, loginData.Password)
 	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			h.responseHelper.Unauthorized(c, "Invalid email or password")
+			return
+		}
 		h.responseHelper.InternalError(c, "Could not create token", err)
 		return
 	}
-
 	h.responseHelper.Success(c, gin.H{"token": token})
 }
 

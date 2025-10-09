@@ -26,7 +26,6 @@ func NewUserService(userRepo repository.UserRepository, jwtService JWTService) U
 }
 
 func (s *userService) Login(email, password string) (string, error) {
-
 	// Check if the user exists
 	user, err := s.userRepo.FindByEmail(email)
 	if err != nil {

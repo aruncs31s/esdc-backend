@@ -11,3 +11,4 @@ uploads/files/*
 tmp/
 
 database/db.db
+tmp/main

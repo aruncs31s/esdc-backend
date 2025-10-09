@@ -9,8 +9,8 @@ import (
 func registerProjectsRoutes(r *gin.Engine, projectHandler handler.ProjectHandler) {
 	projectRoutes := r.Group("/api/projects")
 	{
-		projectRoutes.GET("/", projectHandler.GetAllProjects)
-		projectRoutes.POST("/", projectHandler.CreateProject)
+		projectRoutes.GET("", projectHandler.GetAllProjects)
+		projectRoutes.POST("", projectHandler.CreateProject)
 
 		// projectRoutes.GET("/", projectHandler.List)
 		// projectRoutes.GET("/:id", projectHandler.Get)

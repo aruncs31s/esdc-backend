@@ -8,9 +8,19 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-// TODO: Fix this
-// var SecretKey = []byte(os.Getenv("JWT_SECRET"))
-var SecretKey = []byte("something_big")
+// Global secret key - initialized once
+var SecretKey []byte
+
+func init() {
+	// Initialize SecretKey from environment or use default
+	secretKey := os.Getenv("JWT_SECRET")
+	if secretKey == "" {
+		secretKey = "something_big"
+		log.Println("⚠️  WARNING: Using default JWT secret. Set JWT_SECRET environment variable for production!")
+	}
+	SecretKey = []byte(secretKey)
+	log.Printf("✅ JWT Secret Key initialized (length: %d bytes)\n", len(SecretKey))
+}
 
 type JWTService interface {
 	CreateToken(username, email, role string) (string, error)
@@ -23,24 +33,25 @@ func NewJWTService() JWTService {
 type jwtService struct{}
 
 func (s *jwtService) CreateToken(username, email, role string) (string, error) {
-	secretKey := os.Getenv("JWT_SECRET")
-	if SecretKey == nil {
-		SecretKey = []byte(secretKey)
-	}
+	log.Printf("🔐 Creating JWT token for user: %s, role: %s\n", username, role)
 
-	log.Println("Secret Key: ", secretKey)
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":  email,
-		"user": username,
-		"role": role,
-		"iss":  "esdc-backend",
-		"exp":  time.Now().Add(60 * time.Hour).Unix(),
-		"iat":  time.Now().Unix(),
+		"sub":      email,
+		"username": username, // Changed from "user" to "username" to match middleware
+		"role":     role,
+		"iss":      "esdc-backend",
+		"exp":      time.Now().Add(60 * time.Hour).Unix(),
+		"iat":      time.Now().Unix(),
 	})
-	tokenString, err := claims.SignedString([]byte(secretKey))
+
+	// Use the global SecretKey (same one used in middleware)
+	tokenString, err := claims.SignedString(SecretKey)
 	if err != nil {
+		log.Printf("❌ Error creating token: %v\n", err)
 		return "", err
 	}
+
+	log.Printf("✅ Token created successfully for %s\n", username)
 	return tokenString, nil
 }
 

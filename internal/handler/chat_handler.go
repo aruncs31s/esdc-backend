@@ -36,7 +36,7 @@ var hub = &ChatHub{
 
 func init() {
 	go hub.run()
-	
+
 	// Add mock messages
 	hub.messages = []model.Message{
 		{
@@ -73,7 +73,7 @@ func (h *ChatHub) run() {
 				h.messages = h.messages[1:]
 			}
 			h.mu.Unlock()
-			
+
 			for conn := range h.clients {
 				if err := conn.WriteJSON(message); err != nil {
 					conn.Close()
@@ -97,26 +97,26 @@ func HandleWebSocket(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	
+
 	hub.register <- conn
-	
+
 	// Send message history
 	hub.mu.RLock()
 	for _, msg := range hub.messages {
 		conn.WriteJSON(msg)
 	}
 	hub.mu.RUnlock()
-	
+
 	defer func() {
 		hub.unregister <- conn
 	}()
-	
+
 	for {
 		var msg model.Message
 		if err := conn.ReadJSON(&msg); err != nil {
 			break
 		}
-		
+
 		msg.ID = uuid.New().String()
 		msg.Timestamp = time.Now()
 		hub.broadcast <- msg
@@ -134,6 +134,6 @@ func HandleWebSocket(c *gin.Context) {
 func GetMessages(c *gin.Context) {
 	hub.mu.RLock()
 	defer hub.mu.RUnlock()
-	
+
 	c.JSON(200, gin.H{"data": hub.messages})
 }

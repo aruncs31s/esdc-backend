@@ -16,23 +16,15 @@ func InitDB() {
 	}
 	DB = *db
 
-	// Migrate the schema
+	if err := db.AutoMigrate(&model.User{}, &model.Project{}, &model.Tag{}, &model.Github{}, &model.Submission{}, &model.UserDetails{}, &model.Technologies{}); err != nil {
+		panic("failed to migrate database , USER")
+	}
 
+	// Migrate the schema
 	if err := DB.AutoMigrate(model.Post{}); err != nil {
 		panic("failed to migrate database , POST")
 	}
-	if err := DB.AutoMigrate(model.User{}); err != nil {
-		panic("failed to migrate database , USER")
-	}
-	if err := DB.AutoMigrate(model.Project{}); err != nil {
-		panic("failed to migrate database , PROJECT")
-	}
-	if err := DB.AutoMigrate(model.Github{}); err != nil {
-		panic("failed to migrate database , GITHUB")
-	}
-	if err := DB.AutoMigrate(model.UserDetails{}); err != nil {
-		panic("failed to migrate database , CHALLENGE")
-	}
+
 	// Shopping tables
 	if err := DB.AutoMigrate(model.Product{}); err != nil {
 		panic("failed to migrate database , PRODUCT")

@@ -14,5 +14,12 @@ func registerAdminRoutes(r *gin.Engine, adminHandler handler.AdminHandler) {
 		adminRoutes.DELETE("/users/:id", adminHandler.DeleteUser)
 		adminRoutes.POST("/users", adminHandler.CreateUser)
 	}
+	{
+		adminRoutes.GET("/projects", adminHandler.GetAllProjects)
+		adminRoutes.GET("/projects/:id", adminHandler.GetProjectByID)
+		adminRoutes.POST("/projects", adminHandler.CreateProject)
+		adminRoutes.PUT("/projects/:id", adminHandler.UpdateProject)
+		adminRoutes.DELETE("/projects/:id", adminHandler.DeleteProject)
+	}
 
 }

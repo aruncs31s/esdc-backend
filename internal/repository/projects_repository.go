@@ -8,7 +8,7 @@ import (
 
 type ProjectRepository interface {
 	GetAll() ([]model.Project, error)
-	Create(project *model.Project) (model.Project, error)
+	Create(project *model.Project) error
 	// GetByID(id int) (model.Project, error)
 	// Update(id int, project model.Project) (model.Project, error)
 	// Delete(id int) error
@@ -31,11 +31,11 @@ func (r *projectRepository) GetAll() ([]model.Project, error) {
 	return projects, nil
 }
 
-func (r *projectRepository) Create(project *model.Project) (model.Project, error) {
+func (r *projectRepository) Create(project *model.Project) error {
 	if err := r.db.Create(project).Error; err != nil {
-		return model.Project{}, err
+		return err
 	}
-	return *project, nil
+	return nil
 }
 func (r *projectRepository) GetProjectsCount() (int, error) {
 	var count int64

@@ -11,7 +11,7 @@ func RegisterChatRoutes(r *gin.Engine) {
 	{
 		chat.GET("/chat", handler.HandleWebSocket)
 	}
-	
+
 	api := r.Group("/api/chat")
 	{
 		api.GET("/messages", handler.GetMessages)

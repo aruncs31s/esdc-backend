@@ -6,27 +6,24 @@ import (
 	"esdc-backend/internal/middleware"
 	"esdc-backend/internal/repository"
 	"esdc-backend/internal/service"
-	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(r *gin.Engine) *gin.Engine {
+	// CORS must be applied FIRST, before any routes
 	r.Use(cors.New(cors.Config{
-		AllowOriginFunc: func(origin string) bool {
-			if strings.HasPrefix(origin, "http://localhost:") {
-				return true
-			}
-			return origin == "http://192.168.29.49:3000" || origin == "https://esdc.vercel.app"
-		},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "sentry-trace", "baggage"},
-		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
+		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000", "http://192.168.29.49:3000", "https://esdc.vercel.app", "http://localhost:9090", "http://localhost:8080"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "sentry-trace", "baggage"},
+		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		MaxAge:           12 * 3600, // 12 hours
 	}))
 
 	jwtService := service.NewJWTService()
+
 	db := &initializer.DB
 	userRepository := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepository, jwtService)
@@ -39,8 +36,10 @@ func RegisterRoutes(r *gin.Engine) *gin.Engine {
 
 	// Projects Routes
 	projectRepository := repository.NewProjectRepository(db)
-	projectService := service.NewProjectService(projectRepository)
+	projectService := service.NewProjectService(projectRepository, userRepository)
 	projectHandler := handler.NewProjectHandler(projectService)
+
+	r.Use(middleware.JwtMiddleware())
 
 	registerProjectsRoutes(r, projectHandler)
 
@@ -59,7 +58,6 @@ func RegisterRoutes(r *gin.Engine) *gin.Engine {
 	r.Static("/uploads", "./uploads")
 
 	// Now use middleware to protect the routes
-	r.Use(middleware.JwtMiddleware())
 	postsRepository := repository.NewPostsRepository(db)
 	postsService := service.NewPostsService(postsRepository)
 	postsHandler := handler.NewPostsHandler(postsService)
@@ -84,7 +82,7 @@ func RegisterRoutes(r *gin.Engine) *gin.Engine {
 
 	// Admin Routes
 	adminService := service.NewAdminService(userRepository, projectRepository)
-	adminHandler := handler.NewAdminHandler(adminService)
+	adminHandler := handler.NewAdminHandler(adminService, projectService)
 	registerAdminRoutes(r, adminHandler)
 
 	return r

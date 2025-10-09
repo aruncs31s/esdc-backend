@@ -17,6 +17,7 @@ type ResponseHelper interface {
 	SuccessWithPagination(c *gin.Context, data interface{}, meta interface{})
 	Created(c *gin.Context, data interface{})
 	Deleted(c *gin.Context, message string)
+	Conflict(c *gin.Context, message string, details string)
 }
 
 // Response helper - centralizes response logic
@@ -103,5 +104,16 @@ func (r *responseHelper) Deleted(c *gin.Context, message string) {
 		"status":  true,
 		"message": message,
 		"meta":    time.Now().Format(time.RFC3339),
+	})
+}
+func (r *responseHelper) Conflict(c *gin.Context, message string, details string) {
+	c.JSON(http.StatusConflict, gin.H{
+		"status": false,
+		"error": gin.H{
+			"code":    409,
+			"status":  "CONFLICT",
+			"message": message,
+			"details": details,
+		},
 	})
 }

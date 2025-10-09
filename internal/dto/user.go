@@ -14,12 +14,13 @@ type AdminRegisterRequest struct {
 	RegisterRequest
 	Role string `json:"role" example:"admin"` // User role (e.g., "admin", "user")
 }
+
 // RegisterRequest represents user registration request
 // @Description User registration request payload
 type RegisterRequest struct {
-	Username       string `json:"username" example:"aruncs31s"`                                    // Username (optional)
-	Name           string `json:"name" binding:"required" example:"Arun CS"`                        // Full name
-	Email          string `json:"email" binding:"required,email" example:"aruncs31ss@gmail.com"`    // Email address
-	GithubUsername string `json:"github_username" example:"aruncs31s"`                             // GitHub username (optional)
-	Password       string `json:"password" binding:"required,min=6" example:"password123"`          // Password (minimum 6 characters)
+	Username       string `json:"username" example:"aruncs31s"`                                  // Username (optional)
+	Name           string `json:"name" binding:"required" example:"Arun CS"`                     // Full name
+	Email          string `json:"email" binding:"required,email" example:"aruncs31ss@gmail.com"` // Email address
+	GithubUsername string `json:"github_username" example:"aruncs31s"`                           // GitHub username (optional)
+	Password       string `json:"password" binding:"required,min=6" example:"password123"`       // Password (minimum 6 characters)
 }
