@@ -41,5 +41,34 @@ func InitDB() {
 	if err := DB.AutoMigrate(model.OrderItem{}); err != nil {
 		panic("failed to migrate database , ORDER_ITEM")
 	}
+	admins := []model.User{
+		{
+			Name:     "Arun CS",
+			Email:    "arun31s@gamil.com",
+			Role:     "admin",
+			Password: "12345678",
+			Status:   "active",
+			Github: &model.Github{
+				Username: "arun31s",
+			},
+		},
+		{
+			Name:     "ESDC Admin",
+			Email:    "esdc@gcek.ac.in",
+			Role:     "admin",
+			Password: "12345678",
+			Status:   "active",
+			Github: &model.Github{
+				Username: "esdc",
+			},
+		},
+	}
+	for _, admin := range admins {
+		var existingUser model.User
+		result := db.Where("email = ?", admin.Email).First(&existingUser)
+		if result.Error == gorm.ErrRecordNotFound {
+			db.Create(&admin)
+		}
+	}
 
 }

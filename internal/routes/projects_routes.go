@@ -6,15 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func registerProtectedProjectsRoutes(r *gin.Engine, projectHandler handler.ProjectHandler) {
+	projectRoutes := r.Group("/api/projects")
+	{
+		projectRoutes.POST("", projectHandler.CreateProject)
+
+	}
+}
 func registerProjectsRoutes(r *gin.Engine, projectHandler handler.ProjectHandler) {
 	projectRoutes := r.Group("/api/projects")
 	{
 		projectRoutes.GET("", projectHandler.GetAllProjects)
-		projectRoutes.POST("", projectHandler.CreateProject)
+		projectRoutes.GET("/:id", projectHandler.GetProject)
 
-		// projectRoutes.GET("/", projectHandler.List)
-		// projectRoutes.GET("/:id", projectHandler.Get)
-		// projectRoutes.PUT("/:id", projectHandler.Update)
-		// projectRoutes.DELETE("/:id", projectHandler.Delete)
 	}
 }
+

@@ -17,7 +17,7 @@ type adminHandler struct {
 }
 
 func NewAdminHandler(adminService service.AdminService, projectService service.ProjectService) AdminHandler {
-	adminProjectHandler := newAdminProjectHandler(projectService)
+	adminProjectHandler := newAdminProjectHandler(projectService, adminService)
 	adminUserHandler := newAdminUserHandler(adminService)
 	return &adminHandler{
 		projectHandler: adminProjectHandler,

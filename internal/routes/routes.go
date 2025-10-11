@@ -39,9 +39,18 @@ func RegisterRoutes(r *gin.Engine) *gin.Engine {
 	projectService := service.NewProjectService(projectRepository, userRepository)
 	projectHandler := handler.NewProjectHandler(projectService)
 
-	r.Use(middleware.JwtMiddleware())
-
 	registerProjectsRoutes(r, projectHandler)
+
+	//	ChatBot Routes
+	chatBotRepository := repository.NewChatBotRepository(db)
+	ollamaRepository := repository.NewOllamaRepository(db)
+	chatBotService := service.NewChatBotService(chatBotRepository, ollamaRepository, userRepository)
+	chatBotHandler := handler.NewChatBotHandler(chatBotService)
+
+	registerChatbotRoutes(r, chatBotHandler)
+
+	r.Use(middleware.JwtMiddleware())
+	registerProtectedProjectsRoutes(r, projectHandler)
 
 	// Product Routes (public, no JWT required)
 	productRepository := repository.NewProductRepository(db)

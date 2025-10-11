@@ -5,12 +5,13 @@ import (
 	"esdc-backend/internal/model"
 	"esdc-backend/internal/repository"
 	"fmt"
+	"strings"
 )
 
 type ProjectService interface {
-	GetAllProjects() ([]model.Project, error)
+	GetAllProjects() ([]dto.ProjectResponse, error)
 	CreateProject(user string, project dto.ProjectCreation) (*model.Project, error)
-	// GetProject(id int) (model.Project, error)
+	GetProject(id int) (dto.ProjectResponse, error)
 	// UpdateProject(id int, project model.Project) (model.Project, error)
 	// DeleteProject(id int) error
 }
@@ -30,8 +31,86 @@ func NewProjectService(
 	}
 }
 
-func (s *projectService) GetAllProjects() ([]model.Project, error) {
-	return s.projectRepo.GetAll()
+func (s *projectService) GetAllProjects() ([]dto.ProjectResponse, error) {
+	projects, err := s.projectRepo.GetAll()
+
+	if err != nil {
+		return nil, err
+	}
+
+	projectsPresentation := make([]dto.ProjectResponse, 0)
+	for _, project := range projects {
+		p := dto.ProjectResponse{
+			ID:                  project.ID,
+			Title:               project.Title,
+			Description:         project.Description,
+			GithubLink:          project.GithubLink,
+			Image:               project.Image,
+			LiveUrl:             project.LiveUrl,
+			CreatedAt:           project.CreatedAt,
+			UpdatedAt:           project.UpdatedAt,
+			Status:              project.Status,
+			Likes:               project.Likes,
+			Cost:                project.Cost,
+			Category:            project.Category,
+			CreatorDetails:      getCreatorDetails(project.Creator),
+			ContributorsDetails: getContributorsUsernames(project.Contributors),
+			TagsDetails:         getTagsNames(project.Tags),
+			TechnologyDetails:   getTechnologiesNames(project.Technologies),
+		}
+		projectsPresentation = append(projectsPresentation, p)
+	}
+	return projectsPresentation, nil
+}
+func getCreatorDetails(creator model.User) dto.Contributor {
+	return dto.Contributor{
+		ID:    int(creator.ID),
+		Name:  creator.Username,
+		Email: creator.Email,
+	}
+}
+func getContributorsUsernames(contributors *[]model.User) *[]dto.Contributor {
+	if contributors == nil {
+		return nil
+	}
+	usernames := make([]dto.Contributor, 0)
+	for _, user := range *contributors {
+		usernames = append(usernames, dto.Contributor{
+			ID:    int(user.ID),
+			Name:  user.Username,
+			Email: user.Email,
+		})
+	}
+	// add creator as a contributor also if not already present
+	return &usernames
+}
+func getTagsNames(tags *[]model.Tag) *[]dto.Tag {
+	if tags == nil {
+		return nil
+	}
+	names := make([]dto.Tag, 0)
+	for _, tag := range *tags {
+		names = append(names,
+			dto.Tag{
+				ID:   int(tag.ID),
+				Name: tag.Name,
+			})
+	}
+	return &names
+}
+func getTechnologiesNames(technologies *[]model.Technologies) *[]dto.Technology {
+	if technologies == nil {
+		return nil
+	}
+	names := make([]dto.Technology, 0)
+
+	for _, tech := range *technologies {
+		names = append(names, dto.Technology{
+			ID:   int(tech.ID),
+			Name: tech.Name,
+		})
+	}
+	return &names
 }
 func (s *projectService) CreateProject(user string, project dto.ProjectCreation) (*model.Project, error) {
 	userID, err := s.userRepo.FindUserIDByUsername(user)
@@ -40,29 +119,45 @@ func (s *projectService) CreateProject(user string, project dto.ProjectCreation)
 	}
 	// Build []model.User slice for contributors
 	contributors := make([]model.User, 0)
-	if project.Contributers != nil {
-		for _, username := range *project.Contributers {
-			u, err := s.userRepo.FindByUsername(username)
-			if err != nil {
-				return nil, fmt.Errorf("contributor '%s' not found: %w", username, err)
-			}
-			contributors = append(contributors, u)
-		}
+	// First add the creator as a contributor
+	creator, err := s.userRepo.FindByID(userID)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching creator details: %w", err)
 	}
+	contributors = append(contributors, creator)
+	// now add contributors from the request
+	if project.Contributers != nil && len(*project.Contributers) > 0 {
+		users, err := s.userRepo.FindUsersByUsernames(*project.Contributers)
+		if err != nil {
+			return nil, fmt.Errorf("error fetching contributors: %w", err)
+		}
+		if len(users) != len(*project.Contributers) {
+			return nil, fmt.Errorf("one or more contributors not found")
+		}
+		contributors = append(contributors, users...)
+	}
+
+	// This one , should if the tag exists in the db , if exists assign its value to the project or else create a new tag and assign it to the project
 	tags := make([]model.Tag, 0)
 	if project.Tags != nil {
-		for _, tag := range *project.Tags {
-			tags = append(tags, model.Tag{
-				Name: tag,
-			})
+		for _, tagName := range *project.Tags {
+			tag, err := s.projectRepo.FindOrCreateTag(tagName)
+			if err != nil {
+				return nil, fmt.Errorf("error creating/finding tag: %w", err)
+			}
+			tags = append(tags, *tag)
 		}
 	}
 	technologies := make([]model.Technologies, 0)
 	if project.Technologies != nil {
-		for _, tech := range *project.Technologies {
-			technologies = append(technologies, model.Technologies{
-				Name: tech,
-			})
+		splittedTechnologies := strings.Split((*project.Technologies)[0], ",")
+		for _, techName := range splittedTechnologies {
+			filteredTechName := strings.TrimSpace(techName)
+			tech, err := s.projectRepo.FindOrCreateTechnology(filteredTechName)
+			if err != nil {
+				return nil, fmt.Errorf("error creating/finding technology: %w", err)
+			}
+			technologies = append(technologies, *tech)
 		}
 	}
 	// Create the new project
@@ -73,10 +168,13 @@ func (s *projectService) CreateProject(user string, project dto.ProjectCreation)
 		GithubLink:   project.GithubLink,
 		Tags:         &tags,
 		CreatedBy:    userID,
+		ModifiedBy:   &userID,
+		Status:       "active",         // Default status
+		Likes:        0,                // Default value
+		Category:     project.Category, // Set category from request
 		LiveUrl:      project.LiveUrl,
 		Technologies: &technologies,
-		ModifiedBy:   &userID,
-		Contributors: contributors,
+		Contributors: &contributors,
 	}
 
 	// Save the project and its relationships
@@ -85,4 +183,33 @@ func (s *projectService) CreateProject(user string, project dto.ProjectCreation)
 	}
 
 	return &newProject, nil
+}
+
+func (s *projectService) GetProject(id int) (dto.ProjectResponse, error) {
+
+	project, err := s.projectRepo.GetByID(id)
+
+	if err != nil {
+		return dto.ProjectResponse{}, err
+	}
+
+	p := dto.ProjectResponse{
+		ID:                  project.ID,
+		Title:               project.Title,
+		Description:         project.Description,
+		GithubLink:          project.GithubLink,
+		Image:               project.Image,
+		LiveUrl:             project.LiveUrl,
+		CreatedAt:           project.CreatedAt,
+		UpdatedAt:           project.UpdatedAt,
+		Status:              project.Status,
+		Likes:               project.Likes,
+		Cost:                project.Cost,
+		Category:            project.Category,
+		CreatorDetails:      getCreatorDetails(project.Creator),
+		ContributorsDetails: getContributorsUsernames(project.Contributors),
+		TagsDetails:         getTagsNames(project.Tags),
+		TechnologyDetails:   getTechnologiesNames(project.Technologies),
+	}
+	return p, nil
 }

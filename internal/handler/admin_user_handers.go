@@ -43,7 +43,6 @@ func (h *adminUserHandler) GetAllUsers(c *gin.Context) {
 	role := c.GetString("role")
 	username := c.GetString("username")
 
-	// Debug logging
 	println("🔍 Admin Handler - GetAllUsers:")
 	println("  User:", username)
 	println("  Role:", role)
@@ -135,7 +134,6 @@ func (h *adminUserHandler) DeleteUser(c *gin.Context) {
 // @Router /admin/users [post]
 func (h *adminUserHandler) CreateUser(c *gin.Context) {
 	role := c.GetString("role")
-
 	if role != "admin" {
 		h.responseHelper.Unauthorized(c, "Normal User Can not access this page.")
 		return

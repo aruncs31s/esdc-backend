@@ -39,12 +39,12 @@ func init() {
 
 func main() {
 	r := gin.Default()
-	
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r = routes.RegisterRoutes(r)
 
 	// Swagger endpoint
 
-	r.Run() // listen and serve on 8080
+	r.Run(":9090") // listen and serve on 8080
 }

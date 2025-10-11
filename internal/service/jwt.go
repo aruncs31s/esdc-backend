@@ -23,7 +23,7 @@ func init() {
 }
 
 type JWTService interface {
-	CreateToken(username, email, role string) (string, error)
+	CreateToken(username, email, role, name string) (string, error)
 }
 
 func NewJWTService() JWTService {
@@ -32,12 +32,12 @@ func NewJWTService() JWTService {
 
 type jwtService struct{}
 
-func (s *jwtService) CreateToken(username, email, role string) (string, error) {
+func (s *jwtService) CreateToken(username, email, role, name string) (string, error) {
 	log.Printf("🔐 Creating JWT token for user: %s, role: %s\n", username, role)
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":      email,
-		"username": username, // Changed from "user" to "username" to match middleware
+		"username": username,
 		"role":     role,
 		"iss":      "esdc-backend",
 		"exp":      time.Now().Add(60 * time.Hour).Unix(),

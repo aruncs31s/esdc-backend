@@ -4,9 +4,11 @@ import (
 	"esdc-backend/internal/dto"
 	"esdc-backend/internal/model"
 	"esdc-backend/internal/repository"
+	"time"
 )
 
 type AdminService interface {
+	GetAllProjects(limit, offset int) ([]dto.ProjectsEssentialInfo, error)
 	GetAllUsers() ([]model.User, error)
 	GetUsersStats() (*dto.UsersStats, error)
 	DeleteUser(userID int) error
@@ -24,7 +26,13 @@ func NewAdminService(userRepo repository.UserRepository, projectRepo repository.
 		projectRepo: projectRepo,
 	}
 }
-
+func (s *adminService) GetAllProjects(limit, offset int) ([]dto.ProjectsEssentialInfo, error) {
+	projects, err := s.projectRepo.GetEssentialInfo(limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
 func (s *adminService) GetAllUsers() ([]model.User, error) {
 	users, err := s.userRepo.GetAllUsers()
 	if err != nil {
@@ -63,6 +71,7 @@ func (s *adminService) DeleteUser(userID int) error {
 }
 func (s *adminService) CreateUser(user dto.AdminRegisterRequest) error {
 	newUser := model.User{
+		Name:     user.Name,
 		Username: user.Username,
 		Email:    user.Email,
 		Role:     user.Role,
@@ -70,8 +79,9 @@ func (s *adminService) CreateUser(user dto.AdminRegisterRequest) error {
 		Github: &model.Github{
 			Username: user.GithubUsername,
 		},
+		CreatedAt: time.Time{}.Unix(),
+		UpdatedAt: time.Time{}.Unix(),
 	}
-
 	err := s.userRepo.CreateUser(&newUser)
 	if err != nil {
 		return err

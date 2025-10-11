@@ -3,8 +3,8 @@ package handler
 import (
 	"esdc-backend/internal/dto"
 	"esdc-backend/internal/handler/responses"
-	"esdc-backend/internal/model"
 	"esdc-backend/internal/service"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +13,7 @@ import (
 type ProjectHandler interface {
 	GetAllProjects(c *gin.Context)
 	CreateProject(c *gin.Context)
-	// GetProject(c *gin.Context)
+	GetProject(c *gin.Context)
 	// UpdateProject(c *gin.Context)
 	// DeleteProject(c *gin.Context)
 }
@@ -42,60 +42,11 @@ func NewProjectHandler(projectService service.ProjectService) ProjectHandler {
 // @Router /projects [get]
 func (h *projectHandler) GetAllProjects(c *gin.Context) {
 	projects, err := h.projectService.GetAllProjects()
-
-	projectsPresentation := make([]dto.ProjectResponse, 0)
-	for _, project := range projects {
-		p := dto.ProjectResponse{
-			ID:           project.ID,
-			Title:        project.Title,
-			Description:  project.Description,
-			GithubLink:   project.GithubLink,
-			Image:        project.Image,
-			LiveUrl:      project.LiveUrl,
-			CreatedAt:    project.CreatedAt,
-			UpdatedAt:    project.UpdatedAt,
-			Likes:        project.Likes,
-			Cost:         project.Cost,
-			Category:     project.Category,
-			Contributors: getContributorsUsernames(project.Contributors),
-			Tags:         getTagsNames(project.Tags),
-			Technologies: getTechnologiesNames(project.Technologies),
-		}
-		projectsPresentation = append(projectsPresentation, p)
-	}
 	if err != nil {
 		h.responseHelper.NotFound(c, "No projects found")
 		return
 	}
-	h.responseHelper.Success(c, projectsPresentation)
-}
-func getContributorsUsernames(contributors []model.User) []string {
-	usernames := make([]string, 0)
-	for _, user := range contributors {
-		usernames = append(usernames, user.Username)
-	}
-	return usernames
-}
-func getTagsNames(tags *[]model.Tag) []string {
-	if tags == nil {
-		return nil
-	}
-	names := make([]string, 0)
-	for _, tag := range *tags {
-		names = append(names, tag.Name)
-	}
-	return names
-}
-func getTechnologiesNames(technologies *[]model.Technologies) *[]string {
-	if technologies == nil {
-		return nil
-	}
-	names := make([]string, 0)
-
-	for _, tech := range *technologies {
-		names = append(names, tech.Name)
-	}
-	return &names
+	h.responseHelper.Success(c, projects)
 }
 
 // CreateProject godoc
@@ -122,7 +73,6 @@ func (h *projectHandler) CreateProject(c *gin.Context) {
 		return
 	}
 	createdProject, err := h.projectService.CreateProject(user, project)
-
 	if err != nil && strings.Contains(err.Error(), "UNIQUE constraint failed") {
 		h.responseHelper.Conflict(c, "Project with the same name already exists", err.Error())
 		return
@@ -132,4 +82,24 @@ func (h *projectHandler) CreateProject(c *gin.Context) {
 		return
 	}
 	h.responseHelper.Created(c, createdProject)
+}
+func (h *projectHandler) GetProject(c *gin.Context) {
+	// user := c.GetString("user")
+	idStr := c.Param("id")
+	if idStr == "" {
+		h.responseHelper.BadRequest(c, "Project ID is required", "invalid id")
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		h.responseHelper.BadRequest(c, "Invalid project ID", err.Error())
+		return
+	}
+
+	project, err := h.projectService.GetProject(id)
+	if err != nil {
+		h.responseHelper.NotFound(c, "Project not found")
+		return
+	}
+	h.responseHelper.Success(c, project)
 }

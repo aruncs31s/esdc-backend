@@ -4,6 +4,7 @@ import (
 	"esdc-backend/internal/dto"
 	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,15 +18,17 @@ type AdminProjectHandlers interface {
 }
 
 type adminProjectHandler struct {
+	adminService   service.AdminService
 	projectService service.ProjectService
 	responseHelper responses.ResponseHelper
 }
 
-func newAdminProjectHandler(projectService service.ProjectService) AdminProjectHandlers {
+func newAdminProjectHandler(projectService service.ProjectService, adminService service.AdminService) AdminProjectHandlers {
 	responseHelper := responses.NewResponseHelper()
 	return &adminProjectHandler{
 		responseHelper: responseHelper,
 		projectService: projectService,
+		adminService:   adminService,
 	}
 }
 
@@ -41,13 +44,27 @@ func (h *adminProjectHandler) GetAllProjects(c *gin.Context) {
 	if !verifyAdminRole(c, h.responseHelper) {
 		return
 	}
-	allProjects, err := h.projectService.GetAllProjects()
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "50")
+
+	page := 1
+	limit := 50
+
+	if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+		page = p
+	}
+	if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 1000 {
+		limit = l
+	}
+
+	offset := (page - 1) * limit
+
+	allProjects, err := h.adminService.GetAllProjects(limit, offset)
 	if err != nil {
 		h.responseHelper.InternalError(c, "Failed to retrieve projects", err)
 		return
 	}
 	h.responseHelper.Success(c, allProjects)
-
 }
 func (h *adminProjectHandler) GetProjectByID(c *gin.Context) {
 	// Implementation here

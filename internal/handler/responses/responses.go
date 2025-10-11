@@ -79,14 +79,16 @@ func (r *responseHelper) InternalError(c *gin.Context, message string, err error
 
 func (r *responseHelper) Success(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, gin.H{
-		"status": true,
-		"data":   data,
-		"meta":   time.Now().Format(time.RFC3339),
+		"success": true,
+		"status":  true, // for legacy reasons
+		"data":    data,
+		"meta":    time.Now().Format(time.RFC3339),
 	})
 }
 func (r *responseHelper) SuccessWithPagination(c *gin.Context, data interface{}, meta interface{}) {
 	c.JSON(http.StatusOK, gin.H{
-		"status":     true,
+		"success":    true,
+		"status":     true, // for legacy reasons
 		"data":       data,
 		"pagination": meta,
 	})
@@ -94,14 +96,17 @@ func (r *responseHelper) SuccessWithPagination(c *gin.Context, data interface{},
 
 func (r *responseHelper) Created(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusCreated, gin.H{
-		"status": true,
-		"data":   data,
-		"meta":   time.Now().Format(time.RFC3339),
+		"status":  true,
+		"success": true,
+		"message": "Resource created successfully",
+		"data":    data,
+		"meta":    time.Now().Format(time.RFC3339),
 	})
 }
 func (r *responseHelper) Deleted(c *gin.Context, message string) {
 	c.JSON(http.StatusNoContent, gin.H{
 		"status":  true,
+		"success": true,
 		"message": message,
 		"meta":    time.Now().Format(time.RFC3339),
 	})
