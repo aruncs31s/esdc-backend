@@ -46,5 +46,5 @@ func main() {
 
 	// Swagger endpoint
 
-	r.Run(":9090") // listen and serve on 8080
+	r.Run() // listen and serve on 8080
 }
