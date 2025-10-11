@@ -12,3 +12,6 @@ tmp/
 
 database/db.db
 tmp/main
+main
+esdc-backend
+tmp/build-errors.log
