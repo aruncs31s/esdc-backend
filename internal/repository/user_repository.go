@@ -65,7 +65,7 @@ func (r *userRepository) UpdateUser(user model.User) error {
 }
 func (r *userRepository) GetAllUsers() ([]model.User, error) {
 	var users []model.User
-	result := r.db.Find(&users)
+	result := r.db.Preload("Github").Find(&users)
 	return users, result.Error
 }
 

@@ -9,7 +9,7 @@ import (
 
 type AdminService interface {
 	GetAllProjects(limit, offset int) ([]dto.ProjectsEssentialInfo, error)
-	GetAllUsers() ([]model.User, error)
+	GetAllUsers() ([]dto.UserDataForAdmin, error)
 	GetUsersStats() (*dto.UsersStats, error)
 	DeleteUser(userID int) error
 	CreateUser(user dto.AdminRegisterRequest) error
@@ -33,12 +33,31 @@ func (s *adminService) GetAllProjects(limit, offset int) ([]dto.ProjectsEssentia
 	}
 	return projects, nil
 }
-func (s *adminService) GetAllUsers() ([]model.User, error) {
+func (s *adminService) GetAllUsers() ([]dto.UserDataForAdmin, error) {
 	users, err := s.userRepo.GetAllUsers()
 	if err != nil {
 		return nil, err
 	}
-	return users, nil
+	var filteredUsers []dto.UserDataForAdmin
+	for _, user := range users {
+		filteredUsers = append(filteredUsers, dto.UserDataForAdmin{
+			ID:             user.ID,
+			Name:           user.Name,
+			Email:          user.Email,
+			Username:       user.Username,
+			GithubUsername: user.Github.Username,
+			Role:           user.Role,
+			Status:         user.Status,
+			CreatedAt:      getCreatedDateFromNumber(user.CreatedAt),
+			UpdatedAt:      getCreatedDateFromNumber(user.UpdatedAt),
+		})
+	}
+	return filteredUsers, nil
+}
+
+func getCreatedDateFromNumber(timestamp int64) string {
+	t := time.Unix(timestamp, 0)
+	return t.Format("2006-01-02 15:04:05")
 }
 func (s *adminService) GetUsersStats() (*dto.UsersStats, error) {
 

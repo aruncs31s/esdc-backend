@@ -25,3 +25,15 @@ type RegisterRequest struct {
 	Password       string  `json:"password" binding:"required,min=6" example:"password123"`       // Password (minimum 6 characters)
 	Status         *string `json:"status"`                                                        // Account status (active/inactive)
 }
+
+type UserDataForAdmin struct {
+	ID             uint   `json:"id"`              // User ID
+	Name           string `json:"name"`            // Full name
+	Email          string `json:"email"`           // Email address
+	Username       string `json:"username"`        // Username
+	GithubUsername string `json:"github_username"` // GitHub username
+	Role           string `json:"role"`            // User role (e.g., "admin", "user")
+	Status         string `json:"status"`          // Account status (active/inactive)
+	CreatedAt      string `json:"created_at"`      // Account creation timestamp
+	UpdatedAt      string `json:"updated_at"`      // Account last update timestamp
+}

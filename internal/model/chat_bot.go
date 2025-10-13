@@ -12,6 +12,6 @@ type ChatBotMessage struct {
 	CreatedAt time.Time `gorm:"column:created_at"`
 }
 
-func (Message) TableName() string {
-	return "message"
+func (ChatBotMessage) TableName() string {
+	return "chat_bot_messages"
 }

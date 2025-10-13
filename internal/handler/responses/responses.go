@@ -31,7 +31,7 @@ func NewResponseHelper() ResponseHelper {
 
 func (r *responseHelper) BadRequest(c *gin.Context, message string, details string) {
 	c.JSON(http.StatusBadRequest, gin.H{
-		"status": false,
+		"success": false,
 		"error": gin.H{
 			"code":    400,
 			"status":  "BAD_REQUEST",
@@ -43,7 +43,7 @@ func (r *responseHelper) BadRequest(c *gin.Context, message string, details stri
 
 func (r *responseHelper) NotFound(c *gin.Context, message string) {
 	c.JSON(http.StatusNotFound, gin.H{
-		"status": false,
+		"success": false,
 		"error": gin.H{
 			"code":    404,
 			"status":  "NOT_FOUND",
@@ -66,7 +66,7 @@ func (r *responseHelper) InternalError(c *gin.Context, message string, err error
 	log.Printf("Internal error: %v", err)
 
 	c.JSON(http.StatusInternalServerError, gin.H{
-		"status": false,
+		"success": false,
 		"error": gin.H{
 			"code":    500,
 			"status":  "INTERNAL_SERVER_ERROR",
@@ -80,7 +80,6 @@ func (r *responseHelper) InternalError(c *gin.Context, message string, err error
 func (r *responseHelper) Success(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"status":  true, // for legacy reasons
 		"data":    data,
 		"meta":    time.Now().Format(time.RFC3339),
 	})
@@ -88,7 +87,6 @@ func (r *responseHelper) Success(c *gin.Context, data interface{}) {
 func (r *responseHelper) SuccessWithPagination(c *gin.Context, data interface{}, meta interface{}) {
 	c.JSON(http.StatusOK, gin.H{
 		"success":    true,
-		"status":     true, // for legacy reasons
 		"data":       data,
 		"pagination": meta,
 	})
@@ -96,7 +94,6 @@ func (r *responseHelper) SuccessWithPagination(c *gin.Context, data interface{},
 
 func (r *responseHelper) Created(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusCreated, gin.H{
-		"status":  true,
 		"success": true,
 		"message": "Resource created successfully",
 		"data":    data,
@@ -105,7 +102,6 @@ func (r *responseHelper) Created(c *gin.Context, data interface{}) {
 }
 func (r *responseHelper) Deleted(c *gin.Context, message string) {
 	c.JSON(http.StatusNoContent, gin.H{
-		"status":  true,
 		"success": true,
 		"message": message,
 		"meta":    time.Now().Format(time.RFC3339),
@@ -113,7 +109,7 @@ func (r *responseHelper) Deleted(c *gin.Context, message string) {
 }
 func (r *responseHelper) Conflict(c *gin.Context, message string, details string) {
 	c.JSON(http.StatusConflict, gin.H{
-		"status": false,
+		"success": false,
 		"error": gin.H{
 			"code":    409,
 			"status":  "CONFLICT",

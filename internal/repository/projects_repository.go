@@ -30,7 +30,7 @@ func NewProjectRepository(db *gorm.DB) ProjectRepository {
 // For Admin Pannel
 func (r *projectRepository) GetEssentialInfo(limit, offset int) ([]dto.ProjectsEssentialInfo, error) {
 	var projects []dto.ProjectsEssentialInfo
-	query := r.db.Model(&model.Project{}).Select("projects.id, projects.title, users.name as created_by, projects.status").
+	query := r.db.Model(&model.Project{}).Select("projects.id, projects.title, users.name as created_by, projects.status, projects.created_at, projects.updated_at").
 		Joins("LEFT JOIN users ON projects.created_by = users.id").
 		Limit(limit).Offset(offset)
 	if err := query.Find(&projects).Error; err != nil {

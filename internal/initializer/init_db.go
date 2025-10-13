@@ -41,6 +41,12 @@ func InitDB() {
 	if err := DB.AutoMigrate(model.OrderItem{}); err != nil {
 		panic("failed to migrate database , ORDER_ITEM")
 	}
+	if err := DB.AutoMigrate(model.Ollama{}); err != nil {
+		panic("failed to migrate database , PAYMENT")
+	}
+	if err := DB.AutoMigrate(model.ChatBotMessage{}); err != nil {
+		panic("failed to migrate database , CHAT_BOT_MESSAGE")
+	}
 	admins := []model.User{
 		{
 			Name:     "Arun CS",

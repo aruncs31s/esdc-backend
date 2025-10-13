@@ -148,5 +148,5 @@ func (h *adminUserHandler) CreateUser(c *gin.Context) {
 		h.responseHelper.InternalError(c, "Failed to create user", err)
 		return
 	}
-	h.responseHelper.Success(c, user)
+	h.responseHelper.Success(c, "User created successfully")
 }

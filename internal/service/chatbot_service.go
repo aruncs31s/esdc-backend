@@ -5,6 +5,7 @@ import (
 	"esdc-backend/internal/dto"
 	"esdc-backend/internal/model"
 	"esdc-backend/internal/repository"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -58,13 +59,13 @@ func (s *chatBotService) Ask(user *string, question string) (dto.ChatBotResponse
 	if err := s.chatBotRepo.SaveMessage(&newMessage); err != nil {
 		return dto.ChatBotResponse{}, err
 	}
-
+	fmt.Println("Saved message:", response)
 	return dto.ChatBotResponse{
 		Response: response,
 	}, nil
 }
 func (s *chatBotService) getUser(username *string) *int {
-	if username == nil {
+	if username == nil || *username == "anonymous" {
 		defValue := 0
 		return &defValue
 	}

@@ -27,9 +27,12 @@ func NewChatBotHandler(chatBotService service.ChatBotService) ChatBotHandler {
 
 func (h *chatBotHandler) AskAI(c *gin.Context) {
 	user := c.GetString("user")
+	// if user == "" {
+	// 	h.responseHelper.Unauthorized(c, "user not logged in")
+	// 	return
+	// }
 	if user == "" {
-		h.responseHelper.Unauthorized(c, "user not logged in")
-		return
+		user = "anonymous"
 	}
 	var messageQuery dto.ChatBotRequest
 	if err := c.ShouldBindJSON(&messageQuery); err != nil {

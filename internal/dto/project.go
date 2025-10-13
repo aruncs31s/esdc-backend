@@ -55,4 +55,6 @@ type ProjectsEssentialInfo struct {
 	Title     string `json:"title"`
 	CreatedBy string `json:"created_by"`
 	Status    string `json:"status"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
