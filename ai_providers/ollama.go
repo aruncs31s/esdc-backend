@@ -29,9 +29,9 @@ func (o *Ollama) AskOllama(question string) (string, error) {
 	req := GenerateRequest{
 		Model:  o.Model,
 		Prompt: question,
-		Stream: false,
+		Stream: true,
 	}
-
+	fmt.Println("Ollama request:", req)
 	jsonData, err := json.Marshal(req)
 	if err != nil {
 		return "", err
@@ -48,10 +48,23 @@ func (o *Ollama) AskOllama(question string) (string, error) {
 		return "", fmt.Errorf("Ollama API error: %s", string(body))
 	}
 
-	var result GenerateResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", err
+	// Read the streamed response
+	var fullResponse string
+	decoder := json.NewDecoder(resp.Body)
+	for {
+		var chunk GenerateResponse
+		if err := decoder.Decode(&chunk); err != nil {
+			if err == io.EOF {
+				break
+			}
+			return "", fmt.Errorf("error decoding response: %w", err)
+		}
+		fullResponse += chunk.Response
+		if chunk.Done {
+			break
+		}
 	}
 
-	return result.Response, nil
+	fmt.Println("Ollama response:", fullResponse)
+	return fullResponse, nil
 }
