@@ -9,9 +9,10 @@ import (
 )
 
 type ProjectService interface {
-	GetAllProjects() ([]dto.ProjectResponse, error)
+	GetAllProjects(limit, offset int, user string) ([]dto.ProjectResponse, error)
 	CreateProject(user string, project dto.ProjectCreation) (*model.Project, error)
-	GetProject(id int) (dto.ProjectResponse, error)
+	GetProject(id int, user string) (dto.ProjectResponse, error)
+	ToggleLikeProject(username string, projectID int) (bool, error) // Returns true if liked, false if unliked
 	// UpdateProject(id int, project model.Project) (model.Project, error)
 	// DeleteProject(id int) error
 }
@@ -31,15 +32,28 @@ func NewProjectService(
 	}
 }
 
-func (s *projectService) GetAllProjects() ([]dto.ProjectResponse, error) {
-	projects, err := s.projectRepo.GetAll()
+func (s *projectService) GetAllProjects(limit, offset int, user string) ([]dto.ProjectResponse, error) {
+	projects, err := s.projectRepo.GetAll(limit, offset)
 
 	if err != nil {
 		return nil, err
 	}
-
+	var userID uint
+	if user != "" {
+		userID, err = s.userRepo.FindUserIDByUsername(user)
+		if err != nil {
+			return nil, fmt.Errorf("error fetching user details: %w", err)
+		}
+		if userID == 0 {
+			user = ""
+		}
+	}
 	projectsPresentation := make([]dto.ProjectResponse, 0)
 	for _, project := range projects {
+		isLiked := false
+		if user != "" {
+			isLiked, _ = s.projectRepo.IsLiked(userID, project.ID)
+		}
 		p := dto.ProjectResponse{
 			ID:                  project.ID,
 			Title:               project.Title,
@@ -53,6 +67,7 @@ func (s *projectService) GetAllProjects() ([]dto.ProjectResponse, error) {
 			Likes:               project.Likes,
 			Cost:                project.Cost,
 			Category:            project.Category,
+			IsLiked:             isLiked,
 			CreatorDetails:      getCreatorDetails(project.Creator),
 			ContributorsDetails: getContributorsUsernames(project.Contributors),
 			TagsDetails:         getTagsNames(project.Tags),
@@ -185,12 +200,20 @@ func (s *projectService) CreateProject(user string, project dto.ProjectCreation)
 	return &newProject, nil
 }
 
-func (s *projectService) GetProject(id int) (dto.ProjectResponse, error) {
+func (s *projectService) GetProject(id int, user string) (dto.ProjectResponse, error) {
 
 	project, err := s.projectRepo.GetByID(id)
 
 	if err != nil {
 		return dto.ProjectResponse{}, err
+	}
+
+	isLiked := false
+	if user != "" {
+		userID, err := s.userRepo.FindUserIDByUsername(user)
+		if err == nil {
+			isLiked, _ = s.projectRepo.IsLiked(uint(userID), id)
+		}
 	}
 
 	p := dto.ProjectResponse{
@@ -206,10 +229,33 @@ func (s *projectService) GetProject(id int) (dto.ProjectResponse, error) {
 		Likes:               project.Likes,
 		Cost:                project.Cost,
 		Category:            project.Category,
+		IsLiked:             isLiked,
 		CreatorDetails:      getCreatorDetails(project.Creator),
 		ContributorsDetails: getContributorsUsernames(project.Contributors),
 		TagsDetails:         getTagsNames(project.Tags),
 		TechnologyDetails:   getTechnologiesNames(project.Technologies),
 	}
 	return p, nil
+}
+
+func (s *projectService) ToggleLikeProject(username string, projectID int) (bool, error) {
+	// Get the user ID from username
+	userID, err := s.userRepo.FindUserIDByUsername(username)
+	if err != nil {
+		return false, err
+	}
+	// check if already liked.
+	isLiked, err := s.projectRepo.IsLiked(uint(userID), projectID)
+	if err != nil {
+		return false, err
+	}
+	if isLiked {
+		// Unlike
+		err = s.projectRepo.UnlikeProject(uint(userID), projectID)
+		return false, err
+	} else {
+		// Like
+		err = s.projectRepo.LikeProject(uint(userID), projectID)
+		return true, err
+	}
 }
