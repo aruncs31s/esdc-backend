@@ -8,7 +8,7 @@ import (
 )
 
 type ProjectRepository interface {
-	GetAll() ([]model.Project, error)
+	GetAll(limit, offset int) ([]model.Project, error)
 	GetEssentialInfo(limit, offset int) ([]dto.ProjectsEssentialInfo, error)
 	Create(project *model.Project) error
 	GetByID(id int) (model.Project, error)
@@ -17,6 +17,9 @@ type ProjectRepository interface {
 	GetProjectsCount() (int, error)
 	FindOrCreateTag(name string) (*model.Tag, error)
 	FindOrCreateTechnology(name string) (*model.Technologies, error)
+	IsLiked(userID uint, projectID int) (bool, error)
+	LikeProject(userID uint, projectID int) error
+	UnlikeProject(userID uint, projectID int) error
 }
 
 type projectRepository struct {
@@ -30,7 +33,9 @@ func NewProjectRepository(db *gorm.DB) ProjectRepository {
 // For Admin Pannel
 func (r *projectRepository) GetEssentialInfo(limit, offset int) ([]dto.ProjectsEssentialInfo, error) {
 	var projects []dto.ProjectsEssentialInfo
-	query := r.db.Model(&model.Project{}).Select("projects.id, projects.title, users.name as created_by, projects.status, projects.created_at, projects.updated_at").
+	query := r.db.
+		Model(&model.Project{}).
+		Select("projects.id, projects.title, users.name as created_by, projects.status, projects.created_at, projects.updated_at").
 		Joins("LEFT JOIN users ON projects.created_by = users.id").
 		Limit(limit).Offset(offset)
 	if err := query.Find(&projects).Error; err != nil {
@@ -39,9 +44,9 @@ func (r *projectRepository) GetEssentialInfo(limit, offset int) ([]dto.ProjectsE
 	return projects, nil
 }
 
-func (r *projectRepository) GetAll() ([]model.Project, error) {
+func (r *projectRepository) GetAll(limit, offset int) ([]model.Project, error) {
 	var projects []model.Project
-	if err := r.db.Preload("Contributors").Preload("Creator").Preload("Tags").Preload("Technologies").Find(&projects).Error; err != nil {
+	if err := r.db.Preload("Contributors").Preload("Creator").Preload("Tags").Preload("Technologies").Limit(limit).Offset(offset).Find(&projects).Error; err != nil {
 		return nil, err
 	}
 	return projects, nil
@@ -79,4 +84,44 @@ func (r *projectRepository) FindOrCreateTechnology(name string) (*model.Technolo
 		return nil, err
 	}
 	return &tech, nil
+}
+
+func (r *projectRepository) IsLiked(userID uint, projectID int) (bool, error) {
+	var count int64
+	err := r.db.Table("project_likes").Where("user_id = ? AND project_id = ?", userID, projectID).Count(&count).Error
+	return count > 0, err
+}
+
+func (r *projectRepository) LikeProject(userID uint, projectID int) error {
+	// Add to association
+	var user model.User
+	var project model.Project
+	if err := r.db.First(&user, userID).Error; err != nil {
+		return err
+	}
+	if err := r.db.First(&project, projectID).Error; err != nil {
+		return err
+	}
+	if err := r.db.Model(&user).Association("LikedProjects").Append(&project); err != nil {
+		return err
+	}
+	// Update likes count
+	return r.db.Model(&model.Project{}).Where("id = ?", projectID).Update("likes", gorm.Expr("likes + ?", 1)).Error
+}
+
+func (r *projectRepository) UnlikeProject(userID uint, projectID int) error {
+	// Remove from association
+	var user model.User
+	var project model.Project
+	if err := r.db.First(&user, userID).Error; err != nil {
+		return err
+	}
+	if err := r.db.First(&project, projectID).Error; err != nil {
+		return err
+	}
+	if err := r.db.Model(&user).Association("LikedProjects").Delete(&project); err != nil {
+		return err
+	}
+	// Update likes count
+	return r.db.Model(&model.Project{}).Where("id = ?", projectID).Update("likes", gorm.Expr("likes - ?", 1)).Error
 }

@@ -10,7 +10,7 @@ func registerProtectedProjectsRoutes(r *gin.Engine, projectHandler handler.Proje
 	projectRoutes := r.Group("/api/projects")
 	{
 		projectRoutes.POST("", projectHandler.CreateProject)
-
+		projectRoutes.POST("/:id/like", projectHandler.ToggleLikeProject)
 	}
 }
 func registerProjectsRoutes(r *gin.Engine, projectHandler handler.ProjectHandler) {
@@ -18,7 +18,5 @@ func registerProjectsRoutes(r *gin.Engine, projectHandler handler.ProjectHandler
 	{
 		projectRoutes.GET("", projectHandler.GetAllProjects)
 		projectRoutes.GET("/:id", projectHandler.GetProject)
-
 	}
 }
-
