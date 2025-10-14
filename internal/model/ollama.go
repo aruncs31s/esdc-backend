@@ -7,7 +7,7 @@ type Ollama struct {
 	ModelName string  `gorm:"column:model_name"`
 	Prompt    string  `gorm:"column:prompt"`
 	Response  string  `gorm:"column:response"`
-	AskedBy   *int `gorm:"column:asked_by"`
+	AskedBy   *uint `gorm:"column:asked_by"`
 }
 
 func (Ollama) TableName() string {

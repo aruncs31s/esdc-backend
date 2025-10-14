@@ -20,6 +20,9 @@ func InitDB() {
 		panic("failed to migrate database , USER")
 	}
 
+	if err := DB.AutoMigrate(model.Teams{}); err != nil {
+		panic("failed to migrate database , TEAMS")
+	}
 	// Migrate the schema
 	if err := DB.AutoMigrate(model.Post{}); err != nil {
 		panic("failed to migrate database , POST")
@@ -46,6 +49,9 @@ func InitDB() {
 	}
 	if err := DB.AutoMigrate(model.ChatBotMessage{}); err != nil {
 		panic("failed to migrate database , CHAT_BOT_MESSAGE")
+	}
+	if err := DB.AutoMigrate(model.Notification{}); err != nil {
+		panic("failed to migrate database , NOTIFICATION")
 	}
 	admins := []model.User{
 		{

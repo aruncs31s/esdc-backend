@@ -64,14 +64,14 @@ func (s *chatBotService) Ask(user *string, question string) (dto.ChatBotResponse
 		Response: response,
 	}, nil
 }
-func (s *chatBotService) getUser(username *string) *int {
+func (s *chatBotService) getUser(username *string) *uint {
 	if username == nil || *username == "anonymous" {
-		defValue := 0
+		defValue := uint(0)
 		return &defValue
 	}
 	userID, err := s.userRepo.FindUserIDByUsername(*username)
 	if err != nil {
-		defValue := 0
+		defValue := uint(0)
 		return &defValue
 	}
 	return &userID

@@ -9,8 +9,8 @@ import (
 type UserRepository interface {
 	FindByUsername(username string) (model.User, error)
 	FindUsersByUsernames(usernames []string) ([]model.User, error)
-	FindByID(id int) (model.User, error)
-	FindUserIDByUsername(username string) (int, error)
+	FindByID(id uint) (model.User, error)
+	FindUserIDByUsername(username string) (uint, error)
 	FindByEmail(email string) (model.User, error)
 	CreateUser(user *model.User) error
 	UpdateUser(user model.User) error
@@ -26,7 +26,7 @@ type userRepository struct {
 func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{db: db}
 }
-func (r *userRepository) FindByID(id int) (model.User, error) {
+func (r *userRepository) FindByID(id uint) (model.User, error) {
 	var user model.User
 	result := r.db.First(&user, id)
 	return user, result.Error
@@ -43,10 +43,10 @@ func (r *userRepository) FindUsersByUsernames(usernames []string) ([]model.User,
 	return users, result.Error
 }
 
-func (r *userRepository) FindUserIDByUsername(username string) (int, error) {
+func (r *userRepository) FindUserIDByUsername(username string) (uint, error) {
 	var user model.User
 	result := r.db.Select("id").Where("username = ?", username).First(&user)
-	return int(user.ID), result.Error
+	return user.ID, result.Error
 }
 func (r *userRepository) FindByEmail(email string) (model.User, error) {
 	var user model.User

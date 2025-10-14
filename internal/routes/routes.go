@@ -94,5 +94,16 @@ func RegisterRoutes(r *gin.Engine) *gin.Engine {
 	adminHandler := handler.NewAdminHandler(adminService, projectService)
 	registerAdminRoutes(r, adminHandler)
 
+	// Notification Routes
+
+	notificationRepository := repository.NewNotificationRepository(db)
+	notificationService := service.NewNotificationService(
+		notificationRepository,
+		userRepository)
+	notificationHandler := handler.NewNotificationHandler(
+		notificationService,
+	)
+
+	registerNotificationRoutes(r, notificationHandler)
 	return r
 }

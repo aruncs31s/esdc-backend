@@ -9,8 +9,8 @@ type Project struct {
 	Description  string          `gorm:"column:description"`
 	GithubLink   string          `gorm:"column:github_link"`
 	LiveUrl      *string         `gorm:"column:live_url"`
-	CreatedBy    int             `gorm:"column:created_by;not null"`
-	ModifiedBy   *int            `gorm:"column:modified_by"`
+	CreatedBy    uint            `gorm:"column:created_by;not null"`
+	ModifiedBy   *uint           `gorm:"column:modified_by"`
 	CreatedAt    *time.Time      `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt    *time.Time      `gorm:"column:updated_at;autoUpdateTime"`
 	Likes        int             `gorm:"column:likes;default:0"`
@@ -21,6 +21,7 @@ type Project struct {
 	Contributors *[]User         `gorm:"many2many:project_contributors;" json:"contributors"`
 	Tags         *[]Tag          `gorm:"many2many:project_tags;" json:"tags"`
 	Technologies *[]Technologies `gorm:"many2many:project_technologies;" json:"technologies"`
+	LikedBy      []User          `gorm:"many2many:project_likes;" json:"liked_by"`
 }
 
 func (Project) TableName() string {

@@ -4,7 +4,7 @@ import "time"
 
 type ChatBotMessage struct {
 	ID        int       `gorm:"primaryKey"`
-	AskedBy   *int      `gorm:"column:asked_by"`
+	AskedBy   *uint     `gorm:"column:asked_by"`
 	Role      string    `gorm:"column:role"`
 	Category  *string   `gorm:"column:category"` // project product etc
 	Content   string    `gorm:"column:content"`  // the message.

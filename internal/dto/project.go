@@ -29,6 +29,7 @@ type ProjectResponse struct {
 	Likes               int            `json:"likes"`
 	Cost                int            `json:"cost"`
 	Category            string         `json:"category"`
+	IsLiked             bool           `json:"is_liked"`
 	CreatorDetails      Contributor    `json:"creator_details,omitempty"`
 	ContributorsDetails *[]Contributor `json:"contributors_details,omitempty"`
 	TagsDetails         *[]Tag         `json:"tags_details,omitempty"`

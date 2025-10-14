@@ -14,6 +14,7 @@ type ProjectHandler interface {
 	GetAllProjects(c *gin.Context)
 	CreateProject(c *gin.Context)
 	GetProject(c *gin.Context)
+	ToggleLikeProject(c *gin.Context)
 	// UpdateProject(c *gin.Context)
 	// DeleteProject(c *gin.Context)
 }
@@ -41,7 +42,14 @@ func NewProjectHandler(projectService service.ProjectService) ProjectHandler {
 // @Failure 404 {object} map[string]interface{} "No projects found"
 // @Router /projects [get]
 func (h *projectHandler) GetAllProjects(c *gin.Context) {
-	projects, err := h.projectService.GetAllProjects()
+
+	// Pagination parameters
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "3"))
+	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
+
+	user := c.GetString("user") // May be empty if not authenticated
+
+	projects, err := h.projectService.GetAllProjects(limit, offset, user)
 	if err != nil {
 		h.responseHelper.NotFound(c, "No projects found")
 		return
@@ -96,10 +104,49 @@ func (h *projectHandler) GetProject(c *gin.Context) {
 		return
 	}
 
-	project, err := h.projectService.GetProject(id)
+	user := c.GetString("user") // May be empty
+
+	project, err := h.projectService.GetProject(id, user)
 	if err != nil {
 		h.responseHelper.NotFound(c, "Project not found")
 		return
 	}
 	h.responseHelper.Success(c, project)
+}
+
+// ToggleLikeProject godoc
+// @Summary Toggle like on a project
+// @Description Like or unlike a project
+// @Tags projects
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Project ID"
+// @Success 200 {object} map[string]interface{} "Like toggled successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid project ID"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 404 {object} map[string]interface{} "Project not found"
+// @Router /projects/{id}/like [post]
+func (h *projectHandler) ToggleLikeProject(c *gin.Context) {
+	user := c.GetString("user")
+	if user == "" {
+		h.responseHelper.Unauthorized(c, "User not authenticated")
+		return
+	}
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		h.responseHelper.BadRequest(c, "Invalid project ID", err.Error())
+		return
+	}
+	liked, err := h.projectService.ToggleLikeProject(user, id)
+	if err != nil {
+		h.responseHelper.InternalError(c, "Failed to toggle like", err)
+		return
+	}
+	response := map[string]interface{}{
+		"liked":   liked,
+		"message": "Like toggled successfully",
+	}
+	h.responseHelper.Success(c, response)
 }
