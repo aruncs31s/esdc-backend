@@ -34,7 +34,6 @@ type jwtService struct{}
 
 func (s *jwtService) CreateToken(username, email, role, name string) (string, error) {
 	log.Printf("🔐 Creating JWT token for user: %s, role: %s\n", username, role)
-
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":      email,
 		"username": username,

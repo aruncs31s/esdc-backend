@@ -56,7 +56,7 @@ func InitDB() {
 	admins := []model.User{
 		{
 			Name:     "Arun CS",
-			Email:    "arun31s@gamil.com",
+			Email:    "aruncs31s@gmail.com",
 			Role:     "admin",
 			Password: "12345678",
 			Status:   "active",

@@ -31,6 +31,7 @@ func (s *userService) Login(email, password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	if user.Password != password {
 		return "", err
 	}
