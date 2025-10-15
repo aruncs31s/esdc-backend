@@ -60,6 +60,7 @@ func InitDB() {
 			Role:     "admin",
 			Password: "12345678",
 			Status:   "active",
+			Username: "aruncs",
 			Github: &model.Github{
 				Username: "arun31s",
 			},
@@ -70,6 +71,7 @@ func InitDB() {
 			Role:     "admin",
 			Password: "12345678",
 			Status:   "active",
+			Username: "esdc",
 			Github: &model.Github{
 				Username: "esdc",
 			},
