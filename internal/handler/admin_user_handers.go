@@ -2,10 +2,10 @@ package handler
 
 import (
 	"esdc-backend/internal/dto"
-	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
 	"strconv"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,11 +17,11 @@ type AdminUserHandlers interface {
 }
 type adminUserHandler struct {
 	adminService   service.AdminService
-	responseHelper responses.ResponseHelper
+	responseHelper responsehelper.ResponseHelper
 }
 
 func newAdminUserHandler(adminService service.AdminService) AdminUserHandlers {
-	responseHelper := responses.NewResponseHelper()
+	responseHelper := responsehelper.NewResponseHelper()
 	return &adminUserHandler{
 		responseHelper: responseHelper,
 		adminService:   adminService,

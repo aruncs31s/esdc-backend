@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
 	"fmt"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,12 +15,12 @@ type FileHandler interface {
 }
 
 type fileHandler struct {
-	responseHelper responses.ResponseHelper
+	responseHelper responsehelper.ResponseHelper
 	fileService    service.FileService
 }
 
 func NewFileHandler(fileService service.FileService) FileHandler {
-	responseHelper := responses.NewResponseHelper()
+	responseHelper := responsehelper.NewResponseHelper()
 	return &fileHandler{
 		responseHelper: responseHelper,
 		fileService:    fileService,

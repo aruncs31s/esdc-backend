@@ -14,7 +14,7 @@ import (
 func RegisterRoutes(r *gin.Engine) *gin.Engine {
 	// CORS must be applied FIRST, before any routes
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000", "http://192.168.29.49:3000", "https://esdc.vercel.app", "http://localhost:9090", "http://localhost:8080"},
+		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000", "http://192.168.29.49:3000", "https://esdc.vercel.app", "http://localhost:9090", "http://localhost:8080", "http://localhost:5174"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "sentry-trace", "baggage"},
 		ExposeHeaders:    []string{"Content-Length"},

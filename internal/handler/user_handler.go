@@ -2,10 +2,11 @@ package handler
 
 import (
 	"esdc-backend/internal/dto"
-	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
+	"esdc-backend/utils"
 	"strings"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,12 +19,13 @@ type UserHandler interface {
 	ResetPassword(c *gin.Context)
 }
 type userHandler struct {
-	responseHelper responses.ResponseHelper
+	// responseHelper responses.ResponseHelper
+	responseHelper responsehelper.ResponseHelper
 	userService    service.UserService
 }
 
 func NewUserHandler(userService service.UserService) UserHandler {
-	responseHelper := responses.NewResponseHelper()
+	responseHelper := responsehelper.NewResponseHelper()
 	return &userHandler{
 		responseHelper: responseHelper,
 		userService:    userService,
@@ -44,20 +46,23 @@ func NewUserHandler(userService service.UserService) UserHandler {
 func (h *userHandler) Login(c *gin.Context) {
 	var loginData dto.LoginRequest
 	if err := c.ShouldBindJSON(&loginData); err != nil {
-		h.responseHelper.BadRequest(c, "Bad request", "Invalid request payload")
+		h.responseHelper.BadRequest(c, utils.ErrBadRequest.Error(), utils.ErrDetailBadRequestJSONPayload.Error())
 		return
 	}
 
 	token, err := h.userService.Login(loginData.Email, loginData.Password)
 	if err != nil {
-		if strings.Contains(err.Error(), "record not found") {
-			h.responseHelper.Unauthorized(c, "Invalid email or password")
+		reaction := utils.NewReaction(err)
+		if strings.Contains(err.Error(), utils.ErrNotFound.Error()) {
+			h.responseHelper.Unauthorized(c, utils.ErrEmailorPasswordEmpty.Error())
 			return
 		}
-		h.responseHelper.InternalError(c, "Could not create token", err)
+		h.responseHelper.InternalError(c, reaction.Reaction(), err)
 		return
 	}
-	h.responseHelper.Success(c, gin.H{"token": token})
+	data := map[string]string{"token": token}
+
+	h.responseHelper.Success(c, data)
 }
 
 func (h *userHandler) LogOut(c *gin.Context) {
@@ -89,7 +94,13 @@ func (h *userHandler) Register(c *gin.Context) {
 		h.responseHelper.InternalError(c, "Could not register user", err)
 		return
 	}
-	h.responseHelper.Success(c, registerData)
+	token, err := h.userService.Login(registerData.Email, registerData.Password)
+	if err != nil {
+		h.responseHelper.InternalError(c, "Could not login after registration", err)
+		return
+	}
+	data := map[string]string{"token": token}
+	h.responseHelper.Success(c, data)
 }
 
 func (h *userHandler) VerifyEmail(c *gin.Context) {

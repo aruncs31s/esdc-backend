@@ -2,10 +2,10 @@ package handler
 
 import (
 	"esdc-backend/internal/dto"
-	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
 	"strconv"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,11 +18,11 @@ type NotificationHandler interface {
 
 type notificationHandler struct {
 	notificationService service.NotificationService
-	responseHelper      responses.ResponseHelper
+	responseHelper      responsehelper.ResponseHelper
 }
 
 func NewNotificationHandler(notificationService service.NotificationService) NotificationHandler {
-	responseHelper := responses.NewResponseHelper()
+	responseHelper := responsehelper.NewResponseHelper()
 	return &notificationHandler{
 		notificationService: notificationService,
 		responseHelper:      responseHelper,

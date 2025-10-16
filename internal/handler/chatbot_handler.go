@@ -2,10 +2,10 @@ package handler
 
 import (
 	"esdc-backend/internal/dto"
-	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
 	"strings"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,12 +13,12 @@ type ChatBotHandler interface {
 	AskAI(c *gin.Context)
 }
 type chatBotHandler struct {
-	responseHelper responses.ResponseHelper
+	responseHelper responsehelper.ResponseHelper
 	chatBotService service.ChatBotService
 }
 
 func NewChatBotHandler(chatBotService service.ChatBotService) ChatBotHandler {
-	responseHelper := responses.NewResponseHelper()
+	responseHelper := responsehelper.NewResponseHelper()
 	return &chatBotHandler{
 		responseHelper: responseHelper,
 		chatBotService: chatBotService,

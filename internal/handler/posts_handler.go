@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,11 +13,11 @@ type PostHandler interface {
 
 type postsHandler struct {
 	postsService   service.PostsService
-	responseHelper responses.ResponseHelper
+	responseHelper responsehelper.ResponseHelper
 }
 
 func NewPostsHandler(postsService service.PostsService) PostHandler {
-	responseHelper := responses.NewResponseHelper()
+	responseHelper := responsehelper.NewResponseHelper()
 	return &postsHandler{postsService: postsService, responseHelper: responseHelper}
 }
 

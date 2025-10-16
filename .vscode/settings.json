@@ -1,0 +1,12 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:esdc-backend}/database/db.db",
+            "name": "ESDC DB",
+            "group": "DB"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

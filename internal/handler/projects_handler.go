@@ -2,11 +2,11 @@ package handler
 
 import (
 	"esdc-backend/internal/dto"
-	"esdc-backend/internal/handler/responses"
 	"esdc-backend/internal/service"
 	"strconv"
 	"strings"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,12 +19,12 @@ type ProjectHandler interface {
 	// DeleteProject(c *gin.Context)
 }
 type projectHandler struct {
-	responseHelper responses.ResponseHelper
+	responseHelper responsehelper.ResponseHelper
 	projectService service.ProjectService
 }
 
 func NewProjectHandler(projectService service.ProjectService) ProjectHandler {
-	responseHelper := responses.NewResponseHelper()
+	responseHelper := responsehelper.NewResponseHelper()
 	return &projectHandler{
 		responseHelper: responseHelper,
 		projectService: projectService,
@@ -82,7 +82,7 @@ func (h *projectHandler) CreateProject(c *gin.Context) {
 	}
 	createdProject, err := h.projectService.CreateProject(user, project)
 	if err != nil && strings.Contains(err.Error(), "UNIQUE constraint failed") {
-		h.responseHelper.Conflict(c, "Project with the same name already exists", err.Error())
+		h.responseHelper.BadRequest(c, "Project with the same name already exists", err.Error())
 		return
 	}
 	if err != nil {

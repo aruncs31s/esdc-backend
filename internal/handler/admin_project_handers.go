@@ -2,10 +2,11 @@ package handler
 
 import (
 	"esdc-backend/internal/dto"
-	"esdc-backend/internal/handler/responses"
+	
 	"esdc-backend/internal/service"
 	"strconv"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,11 +21,11 @@ type AdminProjectHandlers interface {
 type adminProjectHandler struct {
 	adminService   service.AdminService
 	projectService service.ProjectService
-	responseHelper responses.ResponseHelper
+	responseHelper responsehelper.ResponseHelper
 }
 
 func newAdminProjectHandler(projectService service.ProjectService, adminService service.AdminService) AdminProjectHandlers {
-	responseHelper := responses.NewResponseHelper()
+	responseHelper := responsehelper.NewResponseHelper()
 	return &adminProjectHandler{
 		responseHelper: responseHelper,
 		projectService: projectService,
@@ -32,7 +33,7 @@ func newAdminProjectHandler(projectService service.ProjectService, adminService 
 	}
 }
 
-func verifyAdminRole(c *gin.Context, responseHelper responses.ResponseHelper) bool {
+func verifyAdminRole(c *gin.Context, responseHelper responsehelper.ResponseHelper) bool {
 	role := c.GetString("role")
 	if role != "admin" {
 		responseHelper.Unauthorized(c, "Admin role required. Your role: "+role)

@@ -4,6 +4,7 @@ import (
 	"esdc-backend/internal/dto"
 	"esdc-backend/internal/model"
 	"esdc-backend/internal/repository"
+	"esdc-backend/utils"
 )
 
 type UserService interface {
@@ -29,16 +30,16 @@ func (s *userService) Login(email, password string) (string, error) {
 	// Check if the user exists
 	user, err := s.userRepo.FindByEmail(email)
 	if err != nil {
-		return "", err
+		return "", utils.ErrUserNotExists
 	}
 
 	if user.Password != password {
-		return "", err
+		return "", utils.ErrPasswordDoesNotMatch
 	}
 	// Generate JWT token
 	token, err := s.jwtService.CreateToken(user.Username, user.Email, user.Role, user.Name)
 	if err != nil {
-		return "", err
+		return "", utils.ErrGeneratingJWT
 	}
 	return token, nil
 }
