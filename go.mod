@@ -3,6 +3,9 @@ module esdc-backend
 go 1.25.2
 
 require (
+	github.com/aruncs31s/esdcauthmodule v0.3.0
+	github.com/aruncs31s/esdcprojectmodule v0.1.6
+	github.com/aruncs31s/esdcusermodule v0.1.4
 	github.com/aruncs31s/responsehelper v0.3.0
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.11.0
@@ -19,9 +22,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/aruncs31s/esdcauthmodule v0.3.0 // indirect
-	github.com/aruncs31s/esdcmodels v0.1.1 // indirect
-	github.com/aruncs31s/esdcusermodule v0.1.0 // indirect
+	github.com/aruncs31s/esdcmodels v0.1.4 // indirect
 	github.com/bytedance/sonic v1.14.0 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
