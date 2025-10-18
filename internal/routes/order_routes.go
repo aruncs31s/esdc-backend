@@ -1,16 +1,16 @@
 package routes
 
 import (
-	"esdc-backend/internal/handler"
+	"esdc-backend/internal/module/common/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
-func registerOrderRoutes(r *gin.Engine, handler *handler.OrderHandler) {
+func registerOrderRoutes(r *gin.Engine, orderHandler *handler.OrderHandler) {
 	orders := r.Group("/api/orders")
 	{
-		orders.GET("", handler.GetOrders)
-		orders.GET("/:id", handler.GetOrderByID)
-		orders.POST("", handler.CreateOrder)
+		orders.GET("", orderHandler.GetOrders)
+		orders.GET("/:id", orderHandler.GetOrderByID)
+		orders.POST("", orderHandler.CreateOrder)
 	}
 }

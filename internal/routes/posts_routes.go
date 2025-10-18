@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"esdc-backend/internal/handler"
+	"esdc-backend/internal/module/common/handler"
 
 	"github.com/gin-gonic/gin"
 )

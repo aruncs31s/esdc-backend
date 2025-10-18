@@ -1,7 +1,8 @@
 package initializer
 
 import (
-	"esdc-backend/internal/model"
+	"esdc-backend/internal/module/common/model"
+	shopmodel "esdc-backend/internal/module/shop/model"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -29,19 +30,19 @@ func InitDB() {
 	}
 
 	// Shopping tables
-	if err := DB.AutoMigrate(model.Product{}); err != nil {
+	if err := DB.AutoMigrate(shopmodel.Product{}); err != nil {
 		panic("failed to migrate database , PRODUCT")
 	}
-	if err := DB.AutoMigrate(model.Cart{}); err != nil {
+	if err := DB.AutoMigrate(shopmodel.Cart{}); err != nil {
 		panic("failed to migrate database , CART")
 	}
-	if err := DB.AutoMigrate(model.Wishlist{}); err != nil {
+	if err := DB.AutoMigrate(shopmodel.Wishlist{}); err != nil {
 		panic("failed to migrate database , WISHLIST")
 	}
-	if err := DB.AutoMigrate(model.Order{}); err != nil {
+	if err := DB.AutoMigrate(shopmodel.Order{}); err != nil {
 		panic("failed to migrate database , ORDER")
 	}
-	if err := DB.AutoMigrate(model.OrderItem{}); err != nil {
+	if err := DB.AutoMigrate(shopmodel.OrderItem{}); err != nil {
 		panic("failed to migrate database , ORDER_ITEM")
 	}
 	if err := DB.AutoMigrate(model.Ollama{}); err != nil {

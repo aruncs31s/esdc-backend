@@ -1,35 +1,33 @@
 package middleware
 
 import (
-	"esdc-backend/internal/service"
+	"esdc-backend/internal/module/auth/service"
 	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/aruncs31s/responsehelper"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
 func JwtMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		responseHelper := responsehelper.NewResponseHelper()
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			fmt.Println("❌ JWT Middleware: No Authorization header provided")
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
+			responseHelper.Unauthorized(c, "Authorization header required")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			fmt.Println("❌ JWT Middleware: Invalid Authorization header format (missing 'Bearer ' prefix)")
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization format. Use: Bearer <token>"})
+			responseHelper.Unauthorized(c, "Invalid authorization format. Use: Bearer <token>")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		fmt.Printf("🔑 JWT Middleware: Validating token: %s...\n", tokenString[:min(20, len(tokenString))])
-
 		// Parse the token
 		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -39,15 +37,13 @@ func JwtMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			fmt.Printf("❌ JWT Middleware: Token parsing error: %v\n", err)
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+			responseHelper.Unauthorized(c, "Invalid or expired token")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		if !token.Valid {
-			fmt.Println("❌ JWT Middleware: Token is not valid")
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is not valid"})
+			responseHelper.Unauthorized(c, "Token is not valid")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -63,7 +59,6 @@ func JwtMiddleware() gin.HandlerFunc {
 			c.Set("user", username)
 			c.Set("username", username)
 			c.Set("role", role)
-			fmt.Printf("✅ JWT Middleware: Token valid - User: %v, Role: %v\n", username, role)
 		}
 
 		c.Next()

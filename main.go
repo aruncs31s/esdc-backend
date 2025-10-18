@@ -1,8 +1,8 @@
 package main
 
 import (
+	"esdc-backend/internal"
 	"esdc-backend/internal/initializer"
-	"esdc-backend/internal/routes"
 
 	_ "esdc-backend/docs" // This will be generated
 
@@ -42,9 +42,7 @@ func main() {
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r = routes.RegisterRoutes(r)
-
-	// Swagger endpoint
+	r = internal.RegisterRoutes(r)
 
 	r.Run() // listen and serve on 8080
 }
