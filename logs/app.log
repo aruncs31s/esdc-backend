@@ -1,0 +1,6 @@
+{"level":"info","ts":"2025-12-27T12:00:59.309-0500","caller":"handler/auth_handler.go:86","msg":"Generating token for user:","Email: ":"aruncs31s@gmail.com","Password":"dhashamulam"}
+{"level":"info","ts":"2025-12-27T12:01:09.810-0500","caller":"handler/auth_handler.go:86","msg":"Generating token for user:","Email: ":"aruncs31s@gmail.com","Password":"dhashamulam"}
+{"level":"info","ts":"2025-12-29T12:23:29.492-0500","caller":"handler/auth_handler.go:86","msg":"Generating token for user:","Email: ":"aruncs31ss@gmail.com","Password":"dhashamulam"}
+{"level":"info","ts":"2025-12-29T12:47:10.114-0500","caller":"handler/auth_handler.go:86","msg":"Generating token for user:","Email: ":"aruncs31ss@gmail.com","Password":"dhashamulam"}
+{"level":"info","ts":"2025-12-29T12:47:12.876-0500","caller":"handler/auth_handler.go:86","msg":"Generating token for user:","Email: ":"aruncs31ss@gmail.com","Password":"dhashamulam"}
+{"level":"info","ts":"2025-12-29T12:47:46.594-0500","caller":"handler/auth_handler.go:86","msg":"Generating token for user:","Email: ":"aruncs31ss@gmail.com","Password":"dhashamulam"}

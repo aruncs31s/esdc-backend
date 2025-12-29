@@ -1,24 +1,21 @@
 package initializer
 
 import (
+	db "esdc-backend/external"
 	"log"
 
 	model "github.com/aruncs31s/esdcmodels"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-var DB gorm.DB
+var DB *gorm.DB
 
-func InitDB() {
-	db, err := gorm.Open(sqlite.Open("database/db.db"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-	DB = *db
+func InitDB() *gorm.DB {
+	db := db.GetDB()
 
 	if err := db.AutoMigrate(model.User{}, model.Github{}, model.Notification{}, model.Technologies{}, model.UserDetails{}, model.Project{}, model.Teams{}, model.Tag{}); err != nil {
 		log.Fatal("failed to migrate database")
 	}
-
+	DB = db
+	return db
 }

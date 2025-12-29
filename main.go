@@ -8,12 +8,16 @@ import (
 )
 
 func init() {
-	initializer.InitDB()
 	initializer.InitDotenv()
+	initializer.InitDB()
 }
 
 func main() {
 	r := gin.Default()
+
+	// Disable redirects for trailing slashes to prevent CORS issues
+	r.RedirectTrailingSlash = false
+	r.RedirectFixedPath = false
 
 	r = internal.RegisterRoutes(r)
 
