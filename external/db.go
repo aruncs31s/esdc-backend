@@ -1,6 +1,5 @@
 package db
 
-
 import (
 	"fmt"
 	"os"
@@ -11,11 +10,11 @@ import (
 
 func GetDSN() string {
 
-	host := os.Getenv("USER_DB_HOST")
-	port := os.Getenv("USER_DB_PORT")
-	user := os.Getenv("USER_DB_USER")
-	password := os.Getenv("USER_DB_PASS")
-	dbname := os.Getenv("USER_DB_NAME")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASS")
+	dbname := os.Getenv("DB_NAME")
 
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?parseTime=true",
@@ -25,7 +24,6 @@ func GetDSN() string {
 		port,
 		dbname,
 	)
-	fmt.Println(dsn)
 	return dsn
 }
 func GetDB() *gorm.DB {
